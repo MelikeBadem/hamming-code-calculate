@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hamming Kodu Hesaplama</title>
+    <style>
+      body,
+      html {
+        height: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .container {
+        border: 2px solid #333;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: #edf7f5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .bit-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2px;
+        margin-bottom: 15px;
+      }
+      .bit {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .parity {
+        background-color: #ff8984; /* Farklı renk */
+      }
+      button {
+        margin-top: 10px;
+        padding: 5px 10px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      h1 {
+        color: #204e5f;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Hamming Kodu Hesaplama</h1>
+      <p>
+        Bu program, kullanıcı tarafından girilen verinin Hamming kodunu hesaplar
+        ve hata oluşturabilir. Oluşturulan hatayı düzeltebilir.
+      </p>
+      <label for="dataInput">Veri Bitleri (0 ve 1'ler): </label>
+      <input type="text" id="dataInput" />
+      <button onclick="simulateError()">Hata Oluştur</button>
+      <button onclick="calculateHamming()">Hesapla</button>
+      <div class="bit-container" id="bitContainer"></div>
+      <p id="result"></p>
+      <p id="errorLocation"></p>
+      <p id="syndrome"></p>
+    </div>
+    <script>
+      let originalData = "";
+
+      // Kullanıcı girişini doğrular
+      function validateInput(inputData) {
+        const validInputLengths = [4, 8, 16];
+        const inputLength = inputData.length;
+        if (!validInputLengths.includes(inputLength)) {
+          alert("Lütfen sadece 4, 8 veya 16 bitlik veri girişi yapın.");
+          return false;
+        }
+        return true;
+      }
+
+      // Hamming kodunu hesaplar
+      function calculateHamming() {
+        let inputData = document.getElementById("dataInput").value;
+        if (!validateInput(inputData)) {
+          return;
+        }
+        originalData = inputData;
+        let hammingCode = calculateHammingCode(inputData);
+        document.getElementById("result").innerText =
+          "Hamming Kodu: " + hammingCode;
+
+        // Bitleri göster
+        showBits(hammingCode);
+      }
+
+      // Bitleri gösterir ve parite bitlerini vurgular
+      function showBits(hammingCode) {
+        let bitContainer = document.getElementById("bitContainer");
+        bitContainer.innerHTML = ""; // Önceki bitleri temizle
+
+        for (let i = 0; i < hammingCode.length; i++) {
+          let bit = document.createElement("div");
+          bit.className = "bit";
+          bit.textContent = hammingCode[i];
+
+          // Parite bitlerini farklı renkle vurgula
+          if (isPowerOfTwo(i + 1)) {
+            bit.classList.add("parity");
+          }
+
+          bitContainer.appendChild(bit);
+        }
+      }
+
+      // Rastgele bir bit hatası oluşturur
+      function simulateError() {
+        let inputData = document.getElementById("dataInput").value;
+        if (!validateInput(inputData)) {
+          return;
+        }
+        let randomIndex = Math.floor(Math.random() * inputData.length);
+        let originalChar = inputData.charAt(randomIndex);
+        let newData =
+          inputData.slice(0, randomIndex) +
+          (originalChar === "0" ? "1" : "0") +
+          inputData.slice(randomIndex + 1);
+        document.getElementById("dataInput").value = newData;
+        document.getElementById("errorLocation").innerText =
+          "Yapay Hata Oluşturuldu: " + (randomIndex + 1);
+      }
+
+      // İki sayının kuvveti olup olmadığını kontrol eder
+      function isPowerOfTwo(n) {
+        return (n & (n - 1)) === 0;
+      }
+
+      // Parite bitinin değerini hesaplar
+      function calculateParityValue(arr, parityIndex) {
+        let parityValue = 0;
+        for (let i = parityIndex; i < arr.length; i++) {
+          if (((i + 1) & (parityIndex + 1)) !== 0) {
+            // Bu bitin bu parite biti için kullanılıp kullanılmayacağını kontrol eder
+            parityValue ^= arr[i];
+          }
+        }
+        return parityValue;
+      }
+
+      // Hamming kodundan sendrom hesaplar
+      function calculateSyndrome(hammingCode) {
+        let syndrome = 0;
+        for (let i = 0; i < hammingCode.length; i++) {
+          if (hammingCode.charAt(i) === "1") {
+            syndrome ^= i + 1; // Bit pozisyonları 1'den başlar
+          }
+        }
+        return syndrome;
+      }
+
+      // Sendromdan hata konumunu bulur
+      function findErrorLocation(syndrome) {
+        return syndrome === 0 ? -1 : syndrome;
+      }
+
+      // Hamming kodunu çözümleyerek hatayı tespit eder
+      function decodeHammingCode(hammingCode) {
+        let syndrome = calculateSyndrome(hammingCode);
+        let errorLocation = findErrorLocation(syndrome);
+        document.getElementById("syndrome").innerText = "Sendrom: " + syndrome;
+        if (errorLocation !== -1) {
+          return (
+            "Hata Bulundu! Hatanın Oluştuğu Bit Pozisyonu: " + errorLocation
+          );
+        } else {
+          return "Hata Yok.";
+        }
+      }
+
+      // Hamming kodunu hesaplar
+      function calculateHammingCode(data) {
+        // Gerekli parite bit sayısını bulur
+        let r = 0;
+        while (Math.pow(2, r) < data.length + r + 1) {
+          r++;
+        }
+
+        // Veri ve parite bitlerini tutacak bir dizi oluşturur
+        let hammingArray = new Array(data.length + r).fill(0);
+
+        // Veri bitlerini doldurur
+        let dataIndex = 0;
+        for (let i = 0; i < hammingArray.length; i++) {
+          if (!isPowerOfTwo(i + 1)) {
+            hammingArray[i] = parseInt(data[dataIndex]);
+            dataIndex++;
+          }
+        }
+
+        // Parite bitlerini hesaplar
+        for (let i = 0; i < r; i++) {
+          let parityIndex = Math.pow(2, i) - 1; // Parite bitinin indeksini hesaplar
+          let parityValue = calculateParityValue(hammingArray, parityIndex);
+          hammingArray[parityIndex] = parityValue;
+        }
+
+        return hammingArray.join("");
+      }
+    </script>
+  </body>
+</html>

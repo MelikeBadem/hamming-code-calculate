@@ -18,7 +18,7 @@ Bu proje, kullanıcı tarafından girilen verinin Hamming kodunu hesaplayan, hat
 4. **Hata Tespiti:** Oluşturulan hatalı veri, sistem tarafından tespit edilir ve hatanın bulunduğu bit konumu belirtilir.
 
 ## Dosya Yapısı
-- `index.html`: Ana HTML dosyası
+- `hamming.html`: Ana HTML dosyası
 - Dahili CSS ile basit bir tasarım sağlar
 - Dahili JavaScript ile Hamming kodu hesaplama, hata oluşturma ve düzeltme işlemlerini yapar.
 

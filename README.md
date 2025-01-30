@@ -33,7 +33,9 @@ Bu proje, kullanıcı tarafından girilen verinin Hamming kodunu hesaplayan, hat
 3. Veri girerek Hamming kodu hesaplama ve hata tespit işlemlerini deneyin.
 
 ## Ekran Görüntüleri
-Bu bölümde projeye ait ekran görüntüleri eklenebilir.
+
+![image](https://github.com/user-attachments/assets/b3d0b517-7907-4843-b007-0d2c08cd9398)
+
 
 ## Lisans
 Bu proje açık kaynak olup, serbestçe kullanılabilir ve geliştirilebilir.

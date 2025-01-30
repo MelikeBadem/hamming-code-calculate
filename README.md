@@ -29,7 +29,7 @@ Bu proje, kullanıcı tarafından girilen verinin Hamming kodunu hesaplayan, hat
 
 ## Çalıştırma Talimatları
 1. Projeyi bir dizine indirin.
-2. `index.html` dosyasını bir tarayıcıda açın.
+2. `hamming.html` dosyasını bir tarayıcıda açın.
 3. Veri girerek Hamming kodu hesaplama ve hata tespit işlemlerini deneyin.
 
 ## Ekran Görüntüleri
